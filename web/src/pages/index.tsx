@@ -11,10 +11,28 @@ import logoImg from '../assets/logo.svg'
 import usersAvatarExampleImg from '../assets/users-avatar-example.png'
 import iconCheckImg from '../assets/icon-check.svg'
 import { api } from '../lib/axios';
+import { FormEvent, useState } from 'react';
 
 export default function Home(props: HomeProps) {
-  function createPool() {
+  const [poolTitle, setPoolTitle] = useState('')
 
+  async function createPool(event: FormEvent) {
+    event.preventDefault()
+
+    try {
+      const response = await api.post('/pools', {
+        title: poolTitle,
+      })
+
+      const { code } = response.data
+      navigator.clipboard.writeText(code)
+      alert('Bolão criado com sucesso. O código foi copiado para a área de transferência.')
+
+      setPoolTitle('')
+    } catch (error) {
+      console.log(error);
+      alert('Falha ao criar o Bolão. Tente novamente.')
+    }
   }
 
   return (
@@ -46,6 +64,8 @@ export default function Home(props: HomeProps) {
               type="text"
               required
               placeholder='Qual nome do seu Bolão?'
+              onChange={event => setPoolTitle(event.target.value)}
+              value={poolTitle}
             />
             <button
               className='bg-yellow-500 px-6 py-4 text-gray-900 font-bold text-sm uppercase hover:bg-yellow-700 rounded'
